@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SURAKSHA_NET — Delhi Smart City Surveillance</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0B0E14;
+  --panel:     #10141C;
+  --panel2:    #151A24;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.04);
+  --accent:    #F0A500;
+  --accent2:   #FFD166;
+  --blue:      #4A9EFF;
+  --red:       #FF3B3B;
+  --orange:    #FF6B35;
+  --green:     #2ECC71;
+  --purple:    #9B59B6;
+  --teal:      #1ABC9C;
+  --text:      #C9D1D9;
+  --text-dim:  #6E7681;
+  --text-bright:#E6EDF3;
+  --mono:      'Share Tech Mono', monospace;
+  --sans:      'Barlow Condensed', sans-serif;
+  --body:      'Barlow', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }   +
+
+html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:var(--body); }
+
+/* ─── LOGIN SCREEN ─────────────────────────────────────────── */
+#login-screen {
+  position:fixed; inset:0; z-index:1000;
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:0;
+}
+
+/* Delhi skyline SVG bg */
+.skyline-bg {
+  position:absolute; bottom:0; left:0; right:0;
+  height:40%;
+  opacity:0.04;
+  pointer-events:none;
+}
+
+.login-glow {
+  position:absolute;
+  width:500px; height:500px;
+  background:radial-gradient(circle, rgba(240,165,0,0.06) 0%, transparent 70%);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+.login-box {
+  position:relative; z-index:2;
+  width:420px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  padding:3rem;
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+.login-box::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0;
+  height:2px;
+  background:linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.login-logo {
+  display:flex; align-items:center; gap:1rem; margin-bottom:2rem;
+}
+
+.bat-emblem {
+  width:48px; height:48px; flex-shrink:0;
+}
+
+.login-title-block {}
+.login-sys-name {
+  font-family:var(--sans);
+  font-size:1.4rem; font-weight:700;
+  letter-spacing:3px; color:#E53935;
+  line-height:1;
+}
+.login-sub {
+  font-family:var(--mono);
+  font-size:0.6rem; letter-spacing:2px;
+  color:var(--text-dim); margin-top:0.3rem;
+}
+
+.login-divider {
+  height:1px; background:var(--border);
+  margin-bottom:2rem;
+}
+
+.login-label {
+  font-family:var(--mono);
+  font-size:0.65rem; letter-spacing:2px;
+  color:var(--text-dim); text-transform:uppercase;
+  margin-bottom:0.5rem; display:block;
+}
+
+.login-input {
+  width:100%;
+  background:var(--bg);
+  border:1px solid var(--border);
+  color:var(--text-bright);
+  font-family:var(--mono); font-size:0.85rem;
+  padding:0.75rem 1rem;
+  margin-bottom:1.2rem;
+  outline:none; transition:border-color 0.2s;
+}
+.login-input:focus { border-color:var(--accent); }
+
+.login-btn {
+  width:100%;
+  background:var(--accent);
+  color:#000;
+  border:none; cursor:pointer;
+  font-family:var(--sans); font-weight:700;
+  font-size:0.9rem; letter-spacing:3px;
+  text-transform:uppercase;
+  padding:0.9rem;
+  transition:all 0.2s;
+  margin-top:0.5rem;
+}
+.login-btn:hover { background:var(--accent2); transform:translateY(-1px); }
+
+.login-footer {
+  margin-top:2rem;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.login-badge-text {
+  font-family:var(--mono); font-size:0.6rem;
+  letter-spacing:1px; color:var(--text-dim);
+}
+.login-status {
+  display:flex; align-items:center; gap:0.4rem;
+  font-family:var(--mono); font-size:0.6rem; color:var(--green);
+}
+.dot { width:6px; height:6px; border-radius:50%; background:var(--green);
+  animation: blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ─── MAIN APP ──────────────────────────────────────────────── */
+#app { display:none; height:100vh; flex-direction:column; }
+
+/* TOPBAR */
+.topbar {
+  height:52px;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 1.2rem;
+  flex-shrink:0;
+  position:relative; z-index:10;
+}
+
+.topbar::after {
+  content:'';
+  position:absolute; bottom:0; left:0; right:0;
+  height:1px;
+  background:linear-gradient(90deg, transparent 0%, var(--accent) 30%, transparent 60%);
+  opacity:0.3;
+}
+
+.topbar-left {
+  display:flex; align-items:center; gap:1.5rem;
+}
+
+.topbar-logo {
+  display:flex; align-items:center; gap:0.7rem;
+}
+
+.topbar-logo-text {
+  font-family:var(--sans); font-weight:700;
+  font-size:1rem; letter-spacing:3px;
+  color:#E53935;
+}
+
+.topbar-sep { width:1px; height:24px; background:var(--border); }
+
+.topbar-system {
+  font-family:var(--mono); font-size:0.62rem;
+  color:var(--text-dim); letter-spacing:1.5px;
+}
+
+.topbar-center {
+  position:absolute; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:0.8rem;
+}
+
+.live-pill {
+  display:flex; align-items:center; gap:0.5rem;
+  background:rgba(255,59,59,0.1);
+  border:1px solid rgba(255,59,59,0.2);
+  padding:0.25rem 0.8rem;
+  font-family:var(--mono); font-size:0.62rem;
+  color:var(--red); letter-spacing:2px;
+}
+
+.topbar-time {
+  font-family:var(--mono); font-size:0.7rem;
+  color:var(--text-dim); letter-spacing:1px;
+}
+
+.topbar-right {
+  display:flex; align-items:center; gap:1.2rem;
+}
+
+.alert-badge {
+  position:relative; cursor:pointer;
+}
+
+.alert-count {
+  position:absolute; top:-6px; right:-6px;
+  width:16px; height:16px;
+  background:var(--red); border-radius:50%;
+  font-family:var(--mono); font-size:0.55rem;
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0%,100%{ box-shadow:0 0 0 0 rgba(255,59,59,0.4); }
+  50%{ box-shadow:0 0 0 6px rgba(255,59,59,0); }
+}
+
+.officer-tag {
+  display:flex; align-items:center; gap:0.6rem;
+  font-family:var(--mono); font-size:0.65rem;
+  color:var(--text-dim);
+}
+
+.officer-avatar {
+  width:28px; height:28px; border-radius:50%;
+  background:linear-gradient(135deg, var(--panel2), var(--bg));
+  border:1px solid var(--accent);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.7rem; color:var(--accent);
+}
+
+/* MAIN LAYOUT */
+.main-layout {
+  display:grid;
+  grid-template-columns:280px 1fr 300px;
+  flex:1; overflow:hidden;
+}
+
+/* ─── LEFT PANEL ─── */
+.left-panel {
+  background:var(--panel);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+
+.panel-header {
+  padding:1rem 1.2rem 0.8rem;
+  border-bottom:1px solid var(--border2);
+  flex-shrink:0;
+}
+
+.panel-title {
+  font-family:var(--sans); font-weight:700;
+  font-size:0.7rem; letter-spacing:3px;
+  color:var(--text-dim); text-transform:uppercase;
+}
+
+.search-bar {
+  display:flex; align-items:center; gap:0.6rem;
+  background:var(--bg);
+  border:1px solid var(--border);
+  padding:0.5rem 0.8rem;
+  margin-top:0.8rem;
+}
+
+.search-bar input {
+  background:none; border:none; outline:none;
+  color:var(--text); font-family:var(--mono);
+  font-size:0.7rem; width:100%;
+}
+
+.search-icon { color:var(--text-dim); font-size:0.75rem; flex-shrink:0; }
+
+.filter-row {
+  display:flex; gap:0.4rem; padding:0.8rem 1.2rem;
+  flex-shrink:0; border-bottom:1px solid var(--border2);
+  overflow-x:auto;
+}
+
+.filter-chip {
+  font-family:var(--mono); font-size:0.58rem;
+  letter-spacing:1px; text-transform:uppercase;
+  padding:0.3rem 0.6rem;
+  border:1px solid var(--border);
+  color:var(--text-dim); cursor:pointer;
+  white-space:nowrap; transition:all 0.2s;
+  flex-shrink:0;
+}
+.filter-chip.active, .filter-chip:hover {
+  border-color:var(--accent); color:var(--accent);
+  background:rgba(240,165,0,0.05);
+}
+
+.offender-list {
+  flex:1; overflow-y:auto; padding:0.6rem;
+}
+
+.offender-list::-webkit-scrollbar { width:3px; }
+.offender-list::-webkit-scrollbar-thumb { background:var(--border); }
+
+.offender-card {
+  padding:0.9rem;
+  border:1px solid var(--border2);
+  margin-bottom:0.5rem;
+  cursor:pointer;
+  transition:all 0.2s;
+  position:relative; overflow:hidden;
+  background:var(--panel2);
+}
+
+.offender-card:hover, .offender-card.selected {
+  border-color:rgba(240,165,0,0.3);
+  background:rgba(240,165,0,0.04);
+}
+
+.offender-card.alert-card {
+  border-color:rgba(255,59,59,0.3);
+  background:rgba(255,59,59,0.04);
+  animation: alert-pulse 3s ease-in-out infinite;
+}
+
+@keyframes alert-pulse {
+  0%,100%{ border-color:rgba(255,59,59,0.3); }
+  50%{ border-color:rgba(255,59,59,0.7); }
+}
+
+.offender-card::before {
+  content:'';
+  position:absolute; left:0; top:0; bottom:0;
+  width:3px;
+}
+
+.card-top {
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:0.5rem;
+}
+
+.card-avatar {
+  width:44px; height:44px; flex-shrink:0;
+  background:var(--bg);
+  border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem;
+  position:relative;
+  overflow:hidden;
+}
+
+.card-avatar img {
+  width:100%; height:100%;
+  object-fit:cover; object-position:center top;
+  filter:grayscale(15%) contrast(1.1) brightness(0.95);
+  display:block;
+}
+
+.card-info { flex:1; min-width:0; }
+
+.card-name {
+  font-family:var(--sans); font-weight:600;
+  font-size:0.9rem; color:var(--text-bright);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+.card-id {
+  font-family:var(--mono); font-size:0.6rem;
+  color:var(--text-dim); margin-top:0.15rem;
+}
+
+.tier-badge {
+  font-family:var(--mono); font-size:0.5rem;
+  letter-spacing:1px; text-transform:uppercase;
+  padding:0.2rem 0.5rem;
+  border:1px solid; flex-shrink:0;
+}
+
+.card-bottom {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-top:0.7rem;
+}
+
+.card-location {
+  font-family:var(--mono); font-size:0.6rem;
+  color:var(--text-dim);
+  display:flex; align-items:center; gap:0.3rem;
+}
+
+.status-pill {
+  font-family:var(--mono); font-size:0.55rem;
+  letter-spacing:1px; text-transform:uppercase;
+  padding:0.15rem 0.5rem;
+  border-radius:20px;
+}
+
+.status-compliant { background:rgba(46,204,113,0.1); color:var(--green); border:1px solid rgba(46,204,113,0.2); }
+.status-alert { background:rgba(255,59,59,0.1); color:var(--red); border:1px solid rgba(255,59,59,0.2); }
+.status-warning { background:rgba(240,165,0,0.1); color:var(--accent); border:1px solid rgba(240,165,0,0.2); }
+
+/* ─── CENTER PANEL (MAP) ─── */
+.center-panel {
+  position:relative; overflow:hidden;
+  background:var(--bg);
+  display:flex; flex-direction:column;
+}
+
+.map-header {
+  padding:0.8rem 1.2rem;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  flex-shrink:0; z-index:2;
+}
+
+.map-title {
+  font-family:var(--sans); font-weight:700;
+  font-size:0.7rem; letter-spacing:3px;
+  color:var(--text-dim); text-transform:uppercase;
+}
+
+.map-controls {
+  display:flex; gap:0.5rem;
+}
+
+.map-ctrl-btn {
+  font-family:var(--mono); font-size:0.6rem;
+  letter-spacing:1px; padding:0.3rem 0.7rem;
+  border:1px solid var(--border); color:var(--text-dim);
+  cursor:pointer; transition:all 0.2s; background:none;
+}
+.map-ctrl-btn.active { border-color:var(--accent); color:var(--accent); background:rgba(240,165,0,0.05); }
+.map-ctrl-btn:hover { border-color:var(--text-dim); color:var(--text); }
+
+.map-container {
+  flex:1; position:relative; overflow:hidden;
+}
+
+/* Delhi Map SVG */
+#delhi-map {
+  width:100%; height:100%;
+}
+
+/* Stat cards overlay on map */
+.map-stats-row {
+  position:absolute; top:1rem; left:1rem; right:1rem;
+  display:flex; gap:0.8rem; z-index:3; pointer-events:none;
+}
+
+.map-stat {
+  background:rgba(16,20,28,0.92);
+  border:1px solid var(--border);
+  padding:0.7rem 1rem;
+  flex:1;
+  backdrop-filter:blur(8px);
+}
+
+.map-stat-num {
+  font-family:var(--sans); font-weight:900;
+  font-size:1.6rem; line-height:1;
+}
+.map-stat-label {
+  font-family:var(--mono); font-size:0.56rem;
+  letter-spacing:1.5px; color:var(--text-dim);
+  margin-top:0.2rem; text-transform:uppercase;
+}
+
+/* Map Legend */
+.map-legend {
+  position:absolute; bottom:1rem; left:1rem;
+  background:rgba(16,20,28,0.92);
+  border:1px solid var(--border);
+  padding:0.8rem;
+  backdrop-filter:blur(8px);
+  z-index:3;
+}
+
+.legend-title {
+  font-family:var(--mono); font-size:0.58rem;
+  letter-spacing:2px; color:var(--text-dim);
+  text-transform:uppercase; margin-bottom:0.6rem;
+}
+
+.legend-item {
+  display:flex; align-items:center; gap:0.5rem;
+  margin-bottom:0.35rem;
+  font-family:var(--mono); font-size:0.6rem; color:var(--text-dim);
+}
+
+.legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.legend-line { width:20px; height:2px; flex-shrink:0; }
+
+/* Tooltip */
+.map-tooltip {
+  position:absolute; z-index:10;
+  background:var(--panel);
+  border:1px solid var(--border);
+  padding:0.7rem 1rem;
+  pointer-events:none; display:none;
+}
+
+.tooltip-name {
+  font-family:var(--sans); font-weight:600;
+  font-size:0.85rem; color:var(--text-bright);
+}
+.tooltip-info {
+  font-family:var(--mono); font-size:0.6rem;
+  color:var(--text-dim); margin-top:0.2rem;
+}
+
+/* ─── RIGHT PANEL ─── */
+.right-panel {
+  background:var(--panel);
+  border-left:1px solid var(--border);
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+
+/* Alert Feed */
+.alert-feed {
+  flex:0 0 auto;
+  border-bottom:1px solid var(--border);
+}
+
+.alert-item {
+  padding:0.8rem 1.2rem;
+  border-bottom:1px solid var(--border2);
+  display:flex; gap:0.8rem; align-items:flex-start;
+  animation: slideIn 0.4s ease forwards;
+}
+
+@keyframes slideIn {
+  from { opacity:0; transform:translateX(10px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+.alert-icon {
+  width:28px; height:28px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.9rem;
+}
+
+.alert-text {
+  flex:1; min-width:0;
+}
+
+.alert-headline {
+  font-family:var(--sans); font-weight:600;
+  font-size:0.8rem; color:var(--text-bright);
+  line-height:1.3;
+}
+
+.alert-meta {
+  font-family:var(--mono); font-size:0.58rem;
+  color:var(--text-dim); margin-top:0.25rem;
+}
+
+.alert-critical .alert-icon { background:rgba(255,59,59,0.1); color:var(--red); }
+.alert-warning .alert-icon { background:rgba(240,165,0,0.1); color:var(--accent); }
+.alert-info .alert-icon { background:rgba(74,158,255,0.1); color:var(--blue); }
+
+/* Activity Timeline */
+.activity-panel { flex:1; overflow-y:auto; }
+
+.activity-panel::-webkit-scrollbar { width:3px; }
+.activity-panel::-webkit-scrollbar-thumb { background:var(--border); }
+
+.timeline-entry {
+  padding:0.8rem 1.2rem;
+  border-bottom:1px solid var(--border2);
+  display:flex; gap:0.8rem; align-items:flex-start;
+}
+
+.timeline-dot {
+  width:8px; height:8px; border-radius:50%;
+  margin-top:0.3rem; flex-shrink:0;
+}
+
+.timeline-content { flex:1; }
+
+.timeline-text {
+  font-family:var(--body); font-size:0.78rem;
+  color:var(--text); line-height:1.4;
+}
+
+.timeline-text strong { color:var(--text-bright); }
+
+.timeline-time {
+  font-family:var(--mono); font-size:0.58rem;
+  color:var(--text-dim); margin-top:0.2rem;
+}
+
+/* ─── PROFILE MODAL ─── */
+.modal-overlay {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center;
+}
+
+.modal-overlay.open { display:flex; }
+
+.profile-modal {
+  width:700px; max-height:85vh;
+  background:var(--panel);
+  border:1px solid var(--border);
+  overflow-y:auto;
+  position:relative;
+  animation: modalIn 0.3s ease forwards;
+}
+
+@keyframes modalIn {
+  from { opacity:0; transform:scale(0.96); }
+  to   { opacity:1; transform:scale(1); }
+}
+
+.profile-modal::-webkit-scrollbar { width:3px; }
+.profile-modal::-webkit-scrollbar-thumb { background:var(--border); }
+
+.modal-topbar {
+  padding:1.2rem 1.5rem;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; background:var(--panel); z-index:2;
+}
+
+.modal-title {
+  font-family:var(--sans); font-weight:700;
+  font-size:0.75rem; letter-spacing:3px;
+  color:var(--text-dim); text-transform:uppercase;
+}
+
+.modal-close {
+  font-family:var(--mono); font-size:0.8rem;
+  color:var(--text-dim); cursor:pointer;
+  padding:0.3rem 0.6rem; border:1px solid var(--border);
+  transition:all 0.2s;
+}
+.modal-close:hover { color:var(--red); border-color:var(--red); }
+
+.modal-body { padding:1.5rem; }
+
+.profile-header {
+  display:grid; grid-template-columns:80px 1fr auto;
+  gap:1.5rem; align-items:start;
+  margin-bottom:1.5rem;
+  padding-bottom:1.5rem;
+  border-bottom:1px solid var(--border2);
+}
+
+.profile-avatar {
+  width:90px; height:90px;
+  background:var(--panel2);
+  border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.5rem;
+  overflow:hidden;
+  flex-shrink:0;
+}
+
+.profile-avatar img {
+  width:100%; height:100%;
+  object-fit:cover; object-position:center top;
+  filter:grayscale(10%) contrast(1.1);
+  display:block;
+}
+
+.profile-name {
+  font-family:var(--sans); font-weight:900;
+  font-size:1.8rem; letter-spacing:1px;
+  color:var(--text-bright); line-height:1;
+}
+
+.profile-id {
+  font-family:var(--mono); font-size:0.65rem;
+  letter-spacing:2px; color:var(--text-dim);
+  margin-top:0.4rem;
+}
+
+.profile-officer {
+  font-family:var(--mono); font-size:0.65rem;
+  color:var(--text-dim); margin-top:0.6rem;
+}
+
+.profile-tier {
+  text-align:right;
+}
+
+.tier-label {
+  font-family:var(--mono); font-size:0.55rem;
+  letter-spacing:2px; color:var(--text-dim);
+  text-transform:uppercase; margin-bottom:0.4rem;
+}
+
+.tier-name {
+  font-family:var(--sans); font-weight:900;
+  font-size:1.1rem; letter-spacing:2px;
+}
+
+.profile-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:1rem; margin-bottom:1.5rem;
+}
+
+.info-block {
+  background:var(--panel2);
+  border:1px solid var(--border2);
+  padding:1rem;
+}
+
+.info-label {
+  font-family:var(--mono); font-size:0.58rem;
+  letter-spacing:2px; color:var(--text-dim);
+  text-transform:uppercase; margin-bottom:0.4rem;
+}
+
+.info-value {
+  font-family:var(--sans); font-weight:600;
+  font-size:0.95rem; color:var(--text-bright);
+}
+
+/* Compliance meter */
+.compliance-section {
+  margin-bottom:1.5rem;
+}
+
+.compliance-header {
+  display:flex; justify-content:space-between;
+  margin-bottom:0.6rem;
+  font-family:var(--mono); font-size:0.62rem;
+  color:var(--text-dim); text-transform:uppercase; letter-spacing:2px;
+}
+
+.compliance-bar {
+  height:6px; background:var(--panel2); position:relative;
+}
+
+.compliance-fill {
+  height:100%; transition:width 1s ease;
+  position:relative;
+}
+
+.compliance-fill::after {
+  content:'';
+  position:absolute; right:0; top:50%;
+  transform:translateY(-50%);
+  width:10px; height:10px; border-radius:50%;
+  background:inherit;
+  box-shadow:0 0 8px currentColor;
+}
+
+/* Timeline in modal */
+.crime-timeline { }
+
+.timeline-modal-entry {
+  display:flex; gap:1rem;
+  padding:0.8rem 0;
+  border-bottom:1px solid var(--border2);
+}
+
+.tm-year {
+  font-family:var(--mono); font-size:0.65rem;
+  color:var(--accent); width:40px; flex-shrink:0;
+  padding-top:0.1rem;
+}
+
+.tm-dot {
+  width:1px; background:var(--border);
+  flex-shrink:0; position:relative;
+}
+
+.tm-dot::before {
+  content:'';
+  position:absolute; top:4px; left:-3px;
+  width:7px; height:7px; border-radius:50%;
+  background:var(--accent);
+}
+
+.tm-content {}
+
+.tm-title {
+  font-family:var(--sans); font-weight:600;
+  font-size:0.85rem; color:var(--text-bright);
+}
+
+.tm-detail {
+  font-family:var(--mono); font-size:0.6rem;
+  color:var(--text-dim); margin-top:0.2rem;
+}
+
+/* Geo-zone info */
+.geo-zones {
+  display:flex; flex-direction:column; gap:0.6rem;
+  margin-top:1rem;
+}
+
+.geo-zone-item {
+  display:flex; align-items:center; gap:0.8rem;
+  padding:0.7rem 1rem;
+  background:var(--panel2);
+  border:1px solid var(--border2);
+  font-family:var(--mono); font-size:0.65rem;
+}
+
+.geo-zone-status {
+  margin-left:auto;
+  font-size:0.6rem; letter-spacing:1px;
+}
+
+/* DOT tracking visualization */
+.tracking-viz {
+  height:160px;
+  background:var(--panel2);
+  border:1px solid var(--border2);
+  position:relative; overflow:hidden;
+  margin-top:1rem;
+}
+
+.track-label {
+  position:absolute; top:0.7rem; left:0.8rem;
+  font-family:var(--mono); font-size:0.58rem;
+  letter-spacing:2px; color:var(--text-dim);
+  text-transform:uppercase;
+}
+
+/* ─── RED ALERT POPUP ─── */
+.alert-popup-overlay {
+  position:fixed; inset:0; z-index:2000;
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center;
+  animation: popFadeIn 0.4s ease forwards;
+}
+
+@keyframes popFadeIn {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+
+.alert-popup {
+  width:520px;
+  background:#0F0608;
+  border:1px solid rgba(255,59,59,0.6);
+  box-shadow:0 0 60px rgba(255,59,59,0.25), 0 0 120px rgba(255,59,59,0.08);
+  position:relative;
+  overflow:hidden;
+  animation: popSlideIn 0.4s ease forwards;
+}
+
+@keyframes popSlideIn {
+  from { transform:scale(0.94) translateY(-10px); opacity:0; }
+  to   { transform:scale(1) translateY(0); opacity:1; }
+}
+
+.alert-popup::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0;
+  height:3px;
+  background:linear-gradient(90deg, transparent, #FF3B3B, #FF6B6B, #FF3B3B, transparent);
+  animation: scanAlert 2s linear infinite;
+}
+
+@keyframes scanAlert {
+  0%   { background-position:0% 0; }
+  100% { background-position:200% 0; }
+}
+
+.alert-popup-header {
+  background:rgba(255,59,59,0.08);
+  border-bottom:1px solid rgba(255,59,59,0.2);
+  padding:1rem 1.5rem;
+  display:flex; align-items:center; gap:1rem;
+}
+
+.alert-popup-icon {
+  width:44px; height:44px; flex-shrink:0;
+  background:rgba(255,59,59,0.15);
+  border:1px solid rgba(255,59,59,0.4);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.4rem;
+  animation: iconPulse 1s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%,100% { box-shadow:0 0 0 0 rgba(255,59,59,0.4); }
+  50%     { box-shadow:0 0 0 10px rgba(255,59,59,0); }
+}
+
+.alert-popup-label {
+  font-family:var(--sans); font-weight:900;
+  font-size:1.5rem; letter-spacing:4px;
+  color:#FF3B3B; line-height:1;
+}
+
+.alert-popup-sublabel {
+  font-family:var(--mono); font-size:0.6rem;
+  letter-spacing:2px; color:rgba(255,59,59,0.6);
+  margin-top:0.3rem; text-transform:uppercase;
+}
+
+.alert-popup-body {
+  padding:1.5rem;
+}
+
+.alert-popup-row {
+  display:flex; gap:1.2rem; margin-bottom:1.2rem;
+}
+
+.popup-photo {
+  width:70px; height:80px; flex-shrink:0;
+  overflow:hidden; border:1px solid rgba(255,59,59,0.3);
+  position:relative;
+}
+
+.popup-photo img {
+  width:100%; height:100%;
+  object-fit:cover; object-position:center top;
+  filter:grayscale(20%) contrast(1.1);
+}
+
+.popup-photo::after {
+  content:'';
+  position:absolute; inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,0,0,0.05) 3px,rgba(255,0,0,0.05) 4px);
+}
+
+.popup-details { flex:1; }
+
+.popup-name {
+  font-family:var(--sans); font-weight:900;
+  font-size:1.3rem; letter-spacing:1px;
+  color:#fff; line-height:1;
+}
+
+.popup-id {
+  font-family:var(--mono); font-size:0.6rem;
+  letter-spacing:2px; color:rgba(255,59,59,0.7);
+  margin-top:0.3rem;
+}
+
+.popup-info-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:0.6rem; margin-top:0.8rem;
+}
+
+.popup-info-item {}
+.popup-info-label {
+  font-family:var(--mono); font-size:0.55rem;
+  letter-spacing:2px; color:rgba(255,255,255,0.3);
+  text-transform:uppercase;
+}
+.popup-info-value {
+  font-family:var(--sans); font-weight:600;
+  font-size:0.85rem; color:#fff; margin-top:0.1rem;
+}
+
+.alert-zone-banner {
+  background:rgba(255,59,59,0.08);
+  border:1px solid rgba(255,59,59,0.25);
+  padding:0.8rem 1rem;
+  display:flex; align-items:center; gap:0.8rem;
+  margin-bottom:1.2rem;
+}
+
+.zone-icon { font-size:1.2rem; }
+
+.zone-text { flex:1; }
+.zone-name {
+  font-family:var(--sans); font-weight:700;
+  font-size:0.95rem; color:#FF3B3B;
+}
+.zone-detail {
+  font-family:var(--mono); font-size:0.6rem;
+  color:rgba(255,255,255,0.4); margin-top:0.2rem;
+}
+
+.popup-actions {
+  display:flex; gap:0.8rem;
+  padding:0 1.5rem 1.5rem;
+}
+
+.popup-btn-primary {
+  flex:1; background:#FF3B3B; color:#fff; border:none;
+  font-family:var(--sans); font-weight:700;
+  font-size:0.85rem; letter-spacing:2px;
+  text-transform:uppercase; padding:0.8rem;
+  cursor:pointer; transition:all 0.2s;
+}
+.popup-btn-primary:hover { background:#FF1A1A; }
+
+.popup-btn-secondary {
+  flex:1; background:transparent; color:rgba(255,255,255,0.5);
+  border:1px solid rgba(255,255,255,0.1);
+  font-family:var(--sans); font-weight:600;
+  font-size:0.85rem; letter-spacing:2px;
+  text-transform:uppercase; padding:0.8rem;
+  cursor:pointer; transition:all 0.2s;
+}
+.popup-btn-secondary:hover { border-color:rgba(255,255,255,0.3); color:rgba(255,255,255,0.8); }
+
+.popup-countdown {
+  font-family:var(--mono); font-size:0.6rem;
+  letter-spacing:1px; color:rgba(255,59,59,0.5);
+  text-align:center; padding-bottom:1rem;
+}
+
+/* Utility */
+.section-hdr {
+  font-family:var(--mono); font-size:0.62rem;
+  letter-spacing:2px; color:var(--text-dim);
+  text-transform:uppercase; margin-bottom:0.8rem;
+  padding-bottom:0.4rem;
+  border-bottom:1px solid var(--border2);
+}
+
+/* Tier colors */
+.joker { color:#FF3B3B; border-color:#FF3B3B; }
+.bane { color:#FF6B35; border-color:#FF6B35; }
+.riddler { color:#4A9EFF; border-color:#4A9EFF; }
+.penguin { color:#9B59B6; border-color:#9B59B6; }
+.scarecrow { color:#2ECC71; border-color:#2ECC71; }
+.twoface { color:#F0A500; border-color:#F0A500; }
+
+.joker-bg { background:rgba(255,59,59,0.08); }
+.bane-bg { background:rgba(255,107,53,0.08); }
+.riddler-bg { background:rgba(74,158,255,0.08); }
+.penguin-bg { background:rgba(155,89,182,0.08); }
+.scarecrow-bg { background:rgba(46,204,113,0.08); }
+.twoface-bg { background:rgba(240,165,0,0.08); }
+
+.joker-bar { background:#FF3B3B; }
+.bane-bar { background:#FF6B35; }
+.riddler-bar { background:#4A9EFF; }
+.penguin-bar { background:#9B59B6; }
+.scarecrow-bar { background:#2ECC71; }
+.twoface-bar { background:#F0A500; }
+
+.joker-left::before { background:#FF3B3B; }
+.bane-left::before { background:#FF6B35; }
+.riddler-left::before { background:#4A9EFF; }
+.penguin-left::before { background:#9B59B6; }
+.scarecrow-left::before { background:#2ECC71; }
+.twoface-left::before { background:#F0A500; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div id="login-screen">
+  <div class="login-glow"></div>
+
+  <!-- Delhi Skyline BG -->
+  <svg class="skyline-bg" viewBox="0 0 1400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="200" width="60" height="100" fill="#F0A500"/>
+    <rect x="10" y="160" width="40" height="40" fill="#F0A500"/>
+    <rect x="70" y="180" width="80" height="120" fill="#F0A500"/>
+    <rect x="90" y="140" width="40" height="40" fill="#F0A500"/>
+    <rect x="160" y="120" width="50" height="180" fill="#F0A500"/>
+    <rect x="170" y="80" width="30" height="40" fill="#F0A500"/>
+    <rect x="180" y="60" width="10" height="20" fill="#F0A500"/>
+    <rect x="220" y="170" width="90" height="130" fill="#F0A500"/>
+    <rect x="235" y="130" width="60" height="40" fill="#F0A500"/>
+    <rect x="320" y="150" width="70" height="150" fill="#F0A500"/>
+    <rect x="400" y="190" width="55" height="110" fill="#F0A500"/>
+    <rect x="465" y="140" width="100" height="160" fill="#F0A500"/>
+    <rect x="485" y="100" width="60" height="40" fill="#F0A500"/>
+    <rect x="575" y="170" width="65" height="130" fill="#F0A500"/>
+    <rect x="650" y="110" width="80" height="190" fill="#F0A500"/>
+    <rect x="670" y="70" width="40" height="40" fill="#F0A500"/>
+    <rect x="740" y="180" width="60" height="120" fill="#F0A500"/>
+    <rect x="810" y="130" width="90" height="170" fill="#F0A500"/>
+    <rect x="830" y="90" width="50" height="40" fill="#F0A500"/>
+    <rect x="910" y="160" width="70" height="140" fill="#F0A500"/>
+    <rect x="990" y="140" width="85" height="160" fill="#F0A500"/>
+    <rect x="1085" y="175" width="60" height="125" fill="#F0A500"/>
+    <rect x="1155" y="120" width="95" height="180" fill="#F0A500"/>
+    <rect x="1175" y="80" width="55" height="40" fill="#F0A500"/>
+    <rect x="1260" y="165" width="70" height="135" fill="#F0A500"/>
+    <rect x="1340" y="190" width="60" height="110" fill="#F0A500"/>
+  </svg>
+
+  <div class="login-box">
+    <div class="login-logo">
+      <!-- Bat Emblem SVG -->
+      <svg class="bat-emblem" viewBox="0 0 48 48" fill="none">
+        <path d="M24 20 C16 14 6 16 2 12 C6 18 10 20 14 20 C10 22 6 28 8 34 C12 28 16 26 20 28 C21 30 22 32 24 34 C26 32 27 30 28 28 C32 26 36 28 40 34 C42 28 38 22 34 20 C38 20 42 18 46 12 C42 16 32 14 24 20Z" fill="#F0A500"/>
+      </svg>
+      <div class="login-title-block">
+        <div class="login-sys-name" style="color:#E53935;">SURAKSHA_NET</div>
+        <div class="login-sub">SURAKSHA_NET · DELHI SMART CITY · ICCC INTEGRATED · v2.4.1</div>
+      </div>
+    </div>
+    <div class="login-divider"></div>
+    <label class="login-label">Officer ID</label>
+    <input class="login-input" type="text" value="DLP-2847" placeholder="DLP-XXXX" />
+    <label class="login-label">Access Code</label>
+    <input class="login-input" type="password" value="••••••••" placeholder="Enter access code" />
+    <button class="login-btn" onclick="launchApp()">AUTHORIZE ACCESS →</button>
+    <div class="login-footer">
+      <div class="login-badge-text">DELHI POLICE · SMART CITY MISSION<br>Ministry of Home Affairs · GoI</div>
+      <div class="login-status"><span class="dot"></span>ICCC ONLINE</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN APP ══════════════ -->
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">
+        <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
+          <path d="M24 20 C16 14 6 16 2 12 C6 18 10 20 14 20 C10 22 6 28 8 34 C12 28 16 26 20 28 C21 30 22 32 24 34 C26 32 27 30 28 28 C32 26 36 28 40 34 C42 28 38 22 34 20 C38 20 42 18 46 12 C42 16 32 14 24 20Z" fill="#F0A500"/>
+        </svg>
+        <span class="topbar-logo-text" style="color:#E53935;">SURAKSHA_NET</span>
+      </div>
+      <div class="topbar-sep"></div>
+      <div class="topbar-system">SURAKSHA_NET · DELHI POST-RELEASE OFFENDER SURVEILLANCE · ICCC NODE</div>
+    </div>
+
+    <div class="topbar-center">
+      <div class="live-pill">
+        <span class="dot" style="background:var(--red)"></span>
+        LIVE
+      </div>
+      <div class="topbar-time" id="clock">--:--:--</div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="alert-badge">
+        <span style="font-size:1rem">🔔</span>
+        <span class="alert-count">2</span>
+      </div>
+      <div class="officer-tag">
+        <div class="officer-avatar">RS</div>
+        <div>
+          <div style="color:var(--text-bright);font-size:0.68rem;">Insp. R. Sharma</div>
+          <div style="font-size:0.58rem;">DLP-2847 · South Delhi Zone</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-layout">
+
+    <!-- ──── LEFT: OFFENDER LIST ──── -->
+    <div class="left-panel">
+      <div class="panel-header">
+        <div class="panel-title">Active Offenders — Delhi NCR</div>
+        <div class="search-bar">
+          <span class="search-icon">⌕</span>
+          <input type="text" placeholder="Search by name, ID, area..." oninput="filterCards(this.value)" />
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-chip active" onclick="setFilter('all',this)">All</div>
+        <div class="filter-chip" onclick="setFilter('alert',this)">🔴 Alerts</div>
+        <div class="filter-chip" onclick="setFilter('extreme',this)">Extreme</div>
+        <div class="filter-chip" onclick="setFilter('high',this)">High Risk</div>
+        <div class="filter-chip" onclick="setFilter('cyber',this)">Cyber</div>
+      </div>
+      <div class="offender-list" id="offender-list">
+        <!-- Cards injected by JS -->
+      </div>
+    </div>
+
+    <!-- ──── CENTER: DELHI MAP ──── -->
+    <div class="center-panel">
+      <div class="map-header">
+        <div class="map-title">Delhi NCR — Live Surveillance Map</div>
+        <div class="map-controls">
+          <button class="map-ctrl-btn active">Movement Trails</button>
+          <button class="map-ctrl-btn">Geo-Zones</button>
+          <button class="map-ctrl-btn">CCTV Nodes</button>
+          <button class="map-ctrl-btn">Metro Sensors</button>
+        </div>
+      </div>
+
+      <div class="map-container">
+        <!-- Stats overlay -->
+        <div class="map-stats-row">
+          <div class="map-stat">
+            <div class="map-stat-num" style="color:var(--text-bright)">6</div>
+            <div class="map-stat-label">Active Offenders</div>
+          </div>
+          <div class="map-stat">
+            <div class="map-stat-num" style="color:var(--red)">2</div>
+            <div class="map-stat-label">Active Alerts</div>
+          </div>
+          <div class="map-stat">
+            <div class="map-stat-num" style="color:var(--green)">67%</div>
+            <div class="map-stat-label">Compliance Rate</div>
+          </div>
+          <div class="map-stat">
+            <div class="map-stat-num" style="color:var(--blue)">142</div>
+            <div class="map-stat-label">CCTV Nodes Active</div>
+          </div>
+        </div>
+
+        <!-- Delhi Map SVG -->
+        <svg id="delhi-map" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="mapGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#F0A500" stop-opacity="0.05"/>
+              <stop offset="100%" stop-color="#0B0E14" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="glow2">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Background -->
+          <rect width="800" height="600" fill="#0B0E14"/>
+          <rect width="800" height="600" fill="url(#mapGlow)"/>
+
+          <!-- Grid lines -->
+          <g stroke="rgba(255,255,255,0.03)" stroke-width="1">
+            <line x1="0" y1="100" x2="800" y2="100"/>
+            <line x1="0" y1="200" x2="800" y2="200"/>
+            <line x1="0" y1="300" x2="800" y2="300"/>
+            <line x1="0" y1="400" x2="800" y2="400"/>
+            <line x1="0" y1="500" x2="800" y2="500"/>
+            <line x1="100" y1="0" x2="100" y2="600"/>
+            <line x1="200" y1="0" x2="200" y2="600"/>
+            <line x1="300" y1="0" x2="300" y2="600"/>
+            <line x1="400" y1="0" x2="400" y2="600"/>
+            <line x1="500" y1="0" x2="500" y2="600"/>
+            <line x1="600" y1="0" x2="600" y2="600"/>
+            <line x1="700" y1="0" x2="700" y2="600"/>
+          </g>
+
+          <!-- Delhi NCR boundary -->
+          <polygon points="120,60 350,30 580,50 720,140 740,320 700,480 500,560 280,570 100,480 60,320 80,150"
+            fill="rgba(240,165,0,0.02)" stroke="rgba(240,165,0,0.15)" stroke-width="1.5" stroke-dasharray="6,4"/>
+
+          <!-- Districts -->
+          <!-- North Delhi -->
+          <polygon points="250,60 420,50 440,180 300,200 200,160" fill="rgba(74,158,255,0.04)" stroke="rgba(74,158,255,0.08)" stroke-width="1"/>
+          <text x="310" y="130" font-family="Share Tech Mono" font-size="9" fill="rgba(74,158,255,0.4)" text-anchor="middle">NORTH DELHI</text>
+
+          <!-- South Delhi -->
+          <polygon points="200,310 480,300 500,460 300,480 180,440" fill="rgba(46,204,113,0.03)" stroke="rgba(46,204,113,0.07)" stroke-width="1"/>
+          <text x="340" y="390" font-family="Share Tech Mono" font-size="9" fill="rgba(46,204,113,0.4)" text-anchor="middle">SOUTH DELHI</text>
+
+          <!-- East Delhi -->
+          <polygon points="480,150 640,130 660,320 500,340 460,220" fill="rgba(155,89,182,0.03)" stroke="rgba(155,89,182,0.07)" stroke-width="1"/>
+          <text x="570" y="240" font-family="Share Tech Mono" font-size="9" fill="rgba(155,89,182,0.4)" text-anchor="middle">EAST DELHI</text>
+
+          <!-- West Delhi -->
+          <polygon points="80,200 200,180 220,360 120,400 60,320" fill="rgba(255,107,53,0.03)" stroke="rgba(255,107,53,0.07)" stroke-width="1"/>
+          <text x="140" y="290" font-family="Share Tech Mono" font-size="9" fill="rgba(255,107,53,0.4)" text-anchor="middle">WEST</text>
+
+          <!-- Central Delhi -->
+          <polygon points="200,160 440,150 460,300 200,310" fill="rgba(240,165,0,0.03)" stroke="rgba(240,165,0,0.1)" stroke-width="1"/>
+          <text x="330" y="240" font-family="Share Tech Mono" font-size="9" fill="rgba(240,165,0,0.5)" text-anchor="middle">CENTRAL</text>
+
+          <!-- Yamuna River -->
+          <path d="M560,40 C540,120 550,200 530,290 C510,380 540,450 520,540" stroke="rgba(74,158,255,0.25)" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <text x="575" y="300" font-family="Share Tech Mono" font-size="8" fill="rgba(74,158,255,0.3)" transform="rotate(85,575,300)">YAMUNA</text>
+
+          <!-- Major roads -->
+          <line x1="50" y1="280" x2="750" y2="280" stroke="rgba(255,255,255,0.06)" stroke-width="2"/>
+          <line x1="380" y1="20" x2="380" y2="580" stroke="rgba(255,255,255,0.06)" stroke-width="2"/>
+          <line x1="100" y1="100" x2="650" y2="480" stroke="rgba(255,255,255,0.04)" stroke-width="1.5"/>
+          <line x1="650" y1="100" x2="150" y2="500" stroke="rgba(255,255,255,0.04)" stroke-width="1.5"/>
+
+          <!-- Metro Lines -->
+          <path d="M80,280 L200,280 L280,210 L400,200 L500,220 L620,260 L700,270" stroke="rgba(74,158,255,0.35)" stroke-width="2.5" fill="none" stroke-dasharray="0"/>
+          <path d="M380,40 L380,150 L360,220 L350,300 L360,380 L380,450 L400,540" stroke="rgba(255,107,53,0.35)" stroke-width="2.5" fill="none"/>
+          <!-- Metro stations -->
+          <g fill="rgba(74,158,255,0.6)">
+            <circle cx="200" cy="280" r="3"/>
+            <circle cx="320" cy="210" r="3"/>
+            <circle cx="450" cy="215" r="3"/>
+            <circle cx="560" cy="250" r="3"/>
+          </g>
+          <g fill="rgba(255,107,53,0.6)">
+            <circle cx="380" cy="150" r="3"/>
+            <circle cx="365" cy="240" r="3"/>
+            <circle cx="380" cy="420" r="3"/>
+          </g>
+
+          <!-- Geo-fence zones (restricted areas) -->
+          <circle cx="340" cy="240" r="70" fill="rgba(255,59,59,0.03)" stroke="rgba(255,59,59,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="340" y="245" font-family="Share Tech Mono" font-size="7" fill="rgba(255,59,59,0.4)" text-anchor="middle">RESTRICTED ZONE A</text>
+
+          <circle cx="550" cy="200" r="50" fill="rgba(255,59,59,0.03)" stroke="rgba(255,59,59,0.15)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="550" y="205" font-family="Share Tech Mono" font-size="7" fill="rgba(255,59,59,0.4)" text-anchor="middle">ZONE B</text>
+
+          <!-- Movement Trails -->
+          <!-- Offender 1: Vikram Sharma (Bane) - South Delhi -->
+          <polyline points="280,380 290,360 310,340 330,320 350,310" stroke="rgba(255,107,53,0.5)" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+          <circle cx="350" cy="310" r="7" fill="rgba(255,107,53,0.15)" stroke="#FF6B35" stroke-width="1.5" filter="url(#glow)" class="offender-dot" data-id="1"/>
+          <circle cx="350" cy="310" r="12" fill="none" stroke="rgba(255,107,53,0.3)" stroke-width="1">
+            <animate attributeName="r" values="7;18;7" dur="2.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.5;0;0.5" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Offender 2: Rajesh Malhotra (Joker) - ALERT: geo breach -->
+          <polyline points="310,230 320,235 335,240 348,238" stroke="rgba(255,59,59,0.6)" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+          <circle cx="348" cy="238" r="8" fill="rgba(255,59,59,0.2)" stroke="#FF3B3B" stroke-width="2" filter="url(#glow)">
+            <animate attributeName="r" values="8;11;8" dur="1s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Alert indicator -->
+          <text x="360" y="230" font-family="Share Tech Mono" font-size="8" fill="#FF3B3B">⚠ BREACH</text>
+
+          <!-- Offender 3: Suresh Kumar (Penguin) - East Delhi -->
+          <polyline points="560,260 555,250 545,235 535,220" stroke="rgba(155,89,182,0.5)" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+          <circle cx="535" cy="220" r="7" fill="rgba(155,89,182,0.15)" stroke="#9B59B6" stroke-width="1.5" filter="url(#glow)" class="offender-dot" data-id="3"/>
+          <circle cx="535" cy="220" r="12" fill="none" stroke="rgba(155,89,182,0.3)" stroke-width="1">
+            <animate attributeName="r" values="7;18;7" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.5;0;0.5" dur="3s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Offender 4: Pankaj Singh (Scarecrow) - ALERT: missed check-in -->
+          <polyline points="160,300 170,290 180,280 195,272" stroke="rgba(46,204,113,0.4)" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+          <circle cx="195" cy="272" r="7" fill="rgba(46,204,113,0.1)" stroke="#2ECC71" stroke-width="1.5" stroke-dasharray="3,2" filter="url(#glow)">
+            <animate attributeName="stroke-opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <text x="205" y="265" font-family="Share Tech Mono" font-size="8" fill="#F0A500">⚠ MISSED</text>
+
+          <!-- Offender 5: Amit Verma (Riddler) - North Delhi -->
+          <polyline points="310,150 320,145 335,140 345,135" stroke="rgba(74,158,255,0.5)" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+          <circle cx="345" cy="135" r="7" fill="rgba(74,158,255,0.15)" stroke="#4A9EFF" stroke-width="1.5" filter="url(#glow)" class="offender-dot" data-id="5"/>
+          <circle cx="345" cy="135" r="12" fill="none" stroke="rgba(74,158,255,0.3)" stroke-width="1">
+            <animate attributeName="r" values="7;18;7" dur="3.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.5;0;0.5" dur="3.5s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Offender 6: Deepak Yadav (Two-Face) - West Delhi -->
+          <polyline points="120,340 130,330 140,315 152,305" stroke="rgba(240,165,0,0.5)" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+          <circle cx="152" cy="305" r="7" fill="rgba(240,165,0,0.15)" stroke="#F0A500" stroke-width="1.5" filter="url(#glow)" class="offender-dot" data-id="6"/>
+          <circle cx="152" cy="305" r="12" fill="none" stroke="rgba(240,165,0,0.3)" stroke-width="1">
+            <animate attributeName="r" values="7;18;7" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Thana (Police Station) markers -->
+          <g fill="rgba(74,158,255,0.7)" font-family="Share Tech Mono" font-size="7">
+            <rect x="374" y="234" width="12" height="12" fill="none" stroke="rgba(74,158,255,0.5)" stroke-width="1"/>
+            <text x="390" y="244" fill="rgba(74,158,255,0.5)">Connaught Thana</text>
+            <rect x="234" y="384" width="12" height="12" fill="none" stroke="rgba(74,158,255,0.5)" stroke-width="1"/>
+            <text x="250" y="394" fill="rgba(74,158,255,0.5)">Saket Thana</text>
+            <rect x="494" y="314" width="12" height="12" fill="none" stroke="rgba(74,158,255,0.5)" stroke-width="1"/>
+            <text x="510" y="324" fill="rgba(74,158,255,0.5)">Laxmi Nagar Thana</text>
+          </g>
+
+          <!-- Sensitive Places: Schools & Hostels -->
+          <!-- Schools -->
+          <g>
+            <rect x="272" y="118" width="14" height="14" fill="rgba(255,200,0,0.08)" stroke="rgba(255,200,0,0.5)" stroke-width="1"/>
+            <text x="279" y="128" font-family="Share Tech Mono" font-size="6" fill="rgba(255,200,0,0.7)" text-anchor="middle">S</text>
+            <text x="290" y="126" font-family="Share Tech Mono" font-size="7" fill="rgba(255,200,0,0.55)">Delhi Public School</text>
+          </g>
+          <g>
+            <rect x="430" y="318" width="14" height="14" fill="rgba(255,200,0,0.08)" stroke="rgba(255,200,0,0.5)" stroke-width="1"/>
+            <text x="437" y="328" font-family="Share Tech Mono" font-size="6" fill="rgba(255,200,0,0.7)" text-anchor="middle">S</text>
+            <text x="448" y="326" font-family="Share Tech Mono" font-size="7" fill="rgba(255,200,0,0.55)">Kendriya Vidyalaya</text>
+          </g>
+          <g>
+            <rect x="160" y="238" width="14" height="14" fill="rgba(255,200,0,0.08)" stroke="rgba(255,200,0,0.5)" stroke-width="1"/>
+            <text x="167" y="248" font-family="Share Tech Mono" font-size="6" fill="rgba(255,200,0,0.7)" text-anchor="middle">S</text>
+            <text x="178" y="246" font-family="Share Tech Mono" font-size="7" fill="rgba(255,200,0,0.55)">Ryan International</text>
+          </g>
+          <!-- Hostels -->
+          <g>
+            <rect x="490" y="145" width="14" height="14" fill="rgba(0,200,255,0.08)" stroke="rgba(0,200,255,0.4)" stroke-width="1"/>
+            <text x="497" y="155" font-family="Share Tech Mono" font-size="6" fill="rgba(0,200,255,0.7)" text-anchor="middle">H</text>
+            <text x="508" y="153" font-family="Share Tech Mono" font-size="7" fill="rgba(0,200,255,0.5)">Govt. Hostel Block-4</text>
+          </g>
+          <g>
+            <rect x="310" y="395" width="14" height="14" fill="rgba(0,200,255,0.08)" stroke="rgba(0,200,255,0.4)" stroke-width="1"/>
+            <text x="317" y="405" font-family="Share Tech Mono" font-size="6" fill="rgba(0,200,255,0.7)" text-anchor="middle">H</text>
+            <text x="328" y="403" font-family="Share Tech Mono" font-size="7" fill="rgba(0,200,255,0.5)">Women's Hostel, Saket</text>
+          </g>
+          <!-- Smart streetlight sensor nodes -->
+          <g opacity="0.5">
+            <circle cx="220" cy="200" r="2" fill="#FFD166"><animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="300" cy="180" r="2" fill="#FFD166"><animate attributeName="opacity" values="0.3;1;0.3" dur="2.5s" repeatCount="indefinite"/></circle>
+            <circle cx="430" cy="170" r="2" fill="#FFD166"><animate attributeName="opacity" values="0.3;1;0.3" dur="4s" repeatCount="indefinite"/></circle>
+            <circle cx="480" cy="260" r="2" fill="#FFD166"><animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/></circle>
+            <circle cx="260" cy="350" r="2" fill="#FFD166"><animate attributeName="opacity" values="0.3;1;0.3" dur="3.5s" repeatCount="indefinite"/></circle>
+            <circle cx="400" cy="350" r="2" fill="#FFD166"><animate attributeName="opacity" values="0.3;1;0.3" dur="2.8s" repeatCount="indefinite"/></circle>
+          </g>
+
+          <!-- CCTV Nodes -->
+          <g>
+            <!-- CCTV Node 1 - Connaught Place -->
+            <circle cx="388" cy="248" r="5" fill="rgba(74,158,255,0.2)" stroke="#4A9EFF" stroke-width="1"/>
+            <line x1="388" y1="243" x2="388" y2="235" stroke="#4A9EFF" stroke-width="0.8" opacity="0.6"/>
+            <circle cx="388" cy="248" r="9" fill="none" stroke="rgba(74,158,255,0.3)" stroke-width="0.8">
+              <animate attributeName="r" values="5;14;5" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0;0.5" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <text x="400" y="245" font-family="Share Tech Mono" font-size="6.5" fill="rgba(74,158,255,0.7)">CCTV-CP-04</text>
+            <text x="400" y="253" font-family="Share Tech Mono" font-size="5.5" fill="rgba(74,158,255,0.4)">LIVE · 1080p</text>
+          </g>
+          <g>
+            <!-- CCTV Node 2 - Near school, North Delhi -->
+            <circle cx="278" cy="112" r="5" fill="rgba(74,158,255,0.2)" stroke="#4A9EFF" stroke-width="1"/>
+            <line x1="278" y1="107" x2="278" y2="99" stroke="#4A9EFF" stroke-width="0.8" opacity="0.6"/>
+            <circle cx="278" cy="112" r="9" fill="none" stroke="rgba(74,158,255,0.3)" stroke-width="0.8">
+              <animate attributeName="r" values="5;14;5" dur="4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0;0.5" dur="4s" repeatCount="indefinite"/>
+            </circle>
+            <text x="290" y="109" font-family="Share Tech Mono" font-size="6.5" fill="rgba(74,158,255,0.7)">CCTV-ND-11</text>
+            <text x="290" y="117" font-family="Share Tech Mono" font-size="5.5" fill="rgba(74,158,255,0.4)">LIVE · 720p</text>
+          </g>
+          <g>
+            <!-- CCTV Node 3 - Saket (near alert zone) -->
+            <circle cx="350" cy="415" r="5" fill="rgba(255,59,59,0.3)" stroke="#FF3B3B" stroke-width="1.2"/>
+            <line x1="350" y1="410" x2="350" y2="402" stroke="#FF3B3B" stroke-width="0.8" opacity="0.8"/>
+            <circle cx="350" cy="415" r="9" fill="none" stroke="rgba(255,59,59,0.4)" stroke-width="0.8">
+              <animate attributeName="r" values="5;16;5" dur="1.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0;0.7" dur="1.5s" repeatCount="indefinite"/>
+            </circle>
+            <text x="362" y="412" font-family="Share Tech Mono" font-size="6.5" fill="rgba(255,59,59,0.9)">CCTV-SK-07</text>
+            <text x="362" y="420" font-family="Share Tech Mono" font-size="5.5" fill="rgba(255,59,59,0.6)">⚠ ALERT FEED</text>
+          </g>
+          <!-- Compass -->
+          <g transform="translate(740,540)">
+            <circle r="20" fill="rgba(16,20,28,0.8)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+            <text x="0" y="-8" text-anchor="middle" font-family="Share Tech Mono" font-size="8" fill="rgba(240,165,0,0.7)">N</text>
+            <text x="0" y="14" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="rgba(255,255,255,0.3)">S</text>
+            <text x="-12" y="4" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="rgba(255,255,255,0.3)">W</text>
+            <text x="12" y="4" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="rgba(255,255,255,0.3)">E</text>
+            <line x1="0" y1="-14" x2="0" y2="14" stroke="rgba(240,165,0,0.4)" stroke-width="0.5"/>
+            <line x1="-14" y1="0" x2="14" y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+          </g>
+
+          <!-- Scale bar -->
+          <g transform="translate(50,570)">
+            <line x1="0" y1="0" x2="80" y2="0" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+            <line x1="0" y1="-4" x2="0" y2="4" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+            <line x1="80" y1="-4" x2="80" y2="4" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+            <text x="40" y="-7" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="rgba(255,255,255,0.3)">10 km</text>
+          </g>
+        </svg>
+
+        <!-- Legend -->
+        <div class="map-legend">
+          <div class="legend-title">Map Legend</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#FF3B3B"></div>Extreme Risk</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#FF6B35"></div>High Risk</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#9B59B6"></div>Organised Crime</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#2ECC71"></div>Narcotics</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#4A9EFF"></div>Cyber Crime</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#F0A500"></div>Repeat Offender</div>
+          <div style="height:6px"></div>
+          <div class="legend-item"><div class="legend-line" style="background:rgba(255,59,59,0.5)"></div>Geo-fence Breach Trail</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#FFD166; width:6px; height:6px"></div>Smart Streetlight Node</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#4A9EFF; width:8px; height:8px; border-radius:0; border:1px solid #4A9EFF"></div>CCTV Node (Active)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#FF3B3B; width:8px; height:8px; border-radius:0; border:1px solid #FF3B3B"></div>CCTV Node (Alert)</div>
+          <div class="legend-item"><div class="legend-line" style="background:rgba(74,158,255,0.5)"></div>Blue Line Metro</div>
+          <div class="legend-item"><div class="legend-line" style="background:rgba(255,107,53,0.5)"></div>Orange Line Metro</div>
+          <div style="height:4px;border-top:1px solid rgba(255,255,255,0.05);margin:4px 0"></div>
+          <div class="legend-item"><div style="width:10px;height:10px;border:1px solid rgba(255,200,0,0.6);display:flex;align-items:center;justify-content:center;font-size:6px;color:rgba(255,200,0,0.8);flex-shrink:0">S</div>School (Sensitive Zone)</div>
+          <div class="legend-item"><div style="width:10px;height:10px;border:1px solid rgba(0,200,255,0.5);display:flex;align-items:center;justify-content:center;font-size:6px;color:rgba(0,200,255,0.8);flex-shrink:0">H</div>Hostel (Sensitive Zone)</div>
+        </div>
+
+        <!-- Tooltip -->
+        <div class="map-tooltip" id="map-tooltip">
+          <div class="tooltip-name" id="tt-name">—</div>
+          <div class="tooltip-info" id="tt-info">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──── RIGHT: ALERTS + ACTIVITY ──── -->
+    <div class="right-panel">
+      <div class="panel-header">
+        <div class="panel-title">⚠ Active Alerts</div>
+      </div>
+
+      <div class="alert-feed">
+        <div class="alert-item alert-critical">
+          <div class="alert-icon">🚨</div>
+          <div class="alert-text">
+            <div class="alert-headline">GEO-FENCE BREACH — Rajesh Malhotra</div>
+            <div class="alert-meta">ARK-DL-1293 · Entered Restricted Zone A · 14:32:07</div>
+          </div>
+        </div>
+        <div class="alert-item alert-warning">
+          <div class="alert-icon">📵</div>
+          <div class="alert-text">
+            <div class="alert-headline">MISSED CHECK-IN — Pankaj Singh</div>
+            <div class="alert-meta">ARK-DL-4521 · Scheduled 14:00 · DoT signal lost · 13:58</div>
+          </div>
+        </div>
+        <div class="alert-item alert-info">
+          <div class="alert-icon">🚇</div>
+          <div class="alert-text">
+            <div class="alert-headline">Metro sensor: Amit Verma at Kashmere Gate</div>
+            <div class="alert-meta">ARK-DL-2156 · Token ID matched · 13:45:22</div>
+          </div>
+        </div>
+        <div class="alert-item alert-info">
+          <div class="alert-icon">💡</div>
+          <div class="alert-text">
+            <div class="alert-headline">Streetlight node: Vikram Sharma — Saket</div>
+            <div class="alert-meta">ARK-DL-2847 · Sensor 4B match · 13:30:11</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-header" style="border-top:1px solid var(--border)">
+        <div class="panel-title">Highlights</div>
+      </div>
+
+      <div class="activity-panel" id="highlights-feed">
+        <!-- injected by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROFILE MODAL ══════════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="profile-modal" id="profile-modal">
+    <div class="modal-topbar">
+      <div class="modal-title">Offender Profile — Restricted Access</div>
+      <div class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕ CLOSE</div>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ RED ALERT POPUP ══════════════ -->
+<div class="alert-popup-overlay" id="alert-popup-overlay" style="display:none">
+  <div class="alert-popup">
+    <div class="alert-popup-header">
+      <div class="alert-popup-icon">🚨</div>
+      <div>
+        <div class="alert-popup-label">⚠ RED ALERT</div>
+        <div class="alert-popup-sublabel">Suraksha_Net · Delhi ICCC · Automated Geo-Breach Detection</div>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-family:var(--mono);font-size:0.6rem;color:rgba(255,59,59,0.6)" id="popup-time">--:--:--</div>
+        <div style="font-family:var(--mono);font-size:0.55rem;color:rgba(255,255,255,0.2);margin-top:0.2rem">AUTO-GENERATED</div>
+      </div>
+    </div>
+
+    <div class="alert-popup-body">
+      <div class="alert-zone-banner">
+        <span class="zone-icon">🏫</span>
+        <div class="zone-text">
+          <div class="zone-name">SENSITIVE ZONE BREACH — School Perimeter</div>
+          <div class="zone-detail">Delhi Public School, Mathura Road · 200m radius violation · Detected via Smart Streetlight Node-4B &amp; DoT Mobile Ping</div>
+        </div>
+      </div>
+
+      <div class="alert-popup-row">
+        <div class="popup-photo">
+          <img src="https://randomuser.me/api/portraits/men/52.jpg" alt="Criminal"/>
+        </div>
+        <div class="popup-details">
+          <div class="popup-name">Rajesh Malhotra</div>
+          <div class="popup-id">ARK-DL-1293 · JOKER TIER — EXTREME RISK</div>
+          <div class="popup-info-grid">
+            <div class="popup-info-item">
+              <div class="popup-info-label">Crime Type</div>
+              <div class="popup-info-value" style="color:#FF3B3B">Robbery &amp; Extortion</div>
+            </div>
+            <div class="popup-info-item">
+              <div class="popup-info-label">Status</div>
+              <div class="popup-info-value" style="color:#FF3B3B">⚠ GEO-BREACH</div>
+            </div>
+            <div class="popup-info-item">
+              <div class="popup-info-label">Last Known Location</div>
+              <div class="popup-info-value">Connaught Place</div>
+            </div>
+            <div class="popup-info-item">
+              <div class="popup-info-label">Assigned Officer</div>
+              <div class="popup-info-value">SI Rajiv Nair <span style="font-family:var(--mono);font-size:0.65rem;color:rgba(255,255,255,0.4)">DLP-0871</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Officer Contact Banner -->
+      <div style="background:rgba(229,57,53,0.07);border:1px solid rgba(229,57,53,0.25);padding:0.9rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.2rem">
+        <div style="display:flex;align-items:center;gap:0.8rem">
+          <div style="width:36px;height:36px;background:rgba(229,57,53,0.12);border:1px solid rgba(229,57,53,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">👮</div>
+          <div>
+            <div style="font-family:var(--mono);font-size:0.56rem;letter-spacing:2px;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:0.2rem">Assigned Parole Officer</div>
+            <div style="font-family:var(--sans);font-weight:700;font-size:0.95rem;color:#fff;letter-spacing:0.5px">SI Rajiv Nair <span style="font-family:var(--mono);font-size:0.6rem;color:rgba(229,57,53,0.7);font-weight:400">· DLP-0871</span></div>
+            <div style="font-family:var(--mono);font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:0.15rem;letter-spacing:1px">📱 98101-55312</div>
+          </div>
+        </div>
+        <a href="tel:9810155312" style="text-decoration:none">
+          <div style="background:#E53935;color:#fff;padding:0.6rem 1.2rem;font-family:var(--sans);font-weight:700;font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:0.5rem;transition:background 0.2s;white-space:nowrap" onmouseover="this.style.background='#C62828'" onmouseout="this.style.background='#E53935'">
+            📞 CALL NOW
+          </div>
+        </a>
+      </div>
+
+      <div class="alert-zone-banner" style="border-color:rgba(255,107,53,0.25);background:rgba(255,107,53,0.06)">
+        <span class="zone-icon">📍</span>
+        <div class="zone-text">
+          <div class="zone-name" style="color:#FF6B35">RESTRICTED ZONE A — Active Perimeter Violation</div>
+          <div class="zone-detail">Offender entered restricted radius at 14:32:07 IST · DoT signal confirmed · CCTV-CP-04 feed alerted · Nearest Thana: Connaught Place PS (1.2km)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="popup-actions">
+      <button class="popup-btn-primary" onclick="document.getElementById('alert-popup-overlay').style.display='none'; openProfile(2)">VIEW FULL PROFILE →</button>
+      <button class="popup-btn-secondary" onclick="document.getElementById('alert-popup-overlay').style.display='none'">ACKNOWLEDGE &amp; DISMISS</button>
+    </div>
+    <div class="popup-countdown" id="popup-countdown">Auto-dismissing in <span id="countdown-num">15</span>s</div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────
+const offenders = [
+  {
+    id:1, name:'Vikram Sharma', arkId:'ARK-DL-2847',
+    tier:'bane', tierName:'BANE TIER', tierColor:'#FF6B35',
+    crime:'Assault & Grievous Hurt', crimeType:'Violent',
+    area:'Saket, South Delhi', district:'South Delhi',
+    officer:'SI Meena Kumari', officerPhone:'98101-44201', officerBadge:'DLP-1042', release:'12 Mar 2024',
+    paroleEnd:'12 Mar 2026', phone:'DoT-7834XXXXX',
+    status:'compliant', compliance:82,
+    avatar:'https://randomuser.me/api/portraits/men/44.jpg',
+    zones:['Restricted Zone A','Victim residence (Rohini)'],
+    history:[
+      {year:'2019',title:'First Arrest — IPC 326',detail:'Grievous hurt with weapon · Saket District Court'},
+      {year:'2021',title:'Conviction — 3 yrs RI',detail:'Sentenced Tihar Jail · Lodhi Colony Court'},
+      {year:'2024',title:'Released on Parole',detail:'Good behaviour · Tracking activated'}
+    ]
+  },
+  {
+    id:2, name:'Rajesh Malhotra', arkId:'ARK-DL-1293',
+    tier:'joker', tierName:'JOKER TIER', tierColor:'#FF3B3B',
+    crime:'Robbery & Extortion', crimeType:'Extreme/Unpredictable',
+    area:'Connaught Place, Central Delhi', district:'Central Delhi',
+    officer:'SI Rajiv Nair', officerPhone:'98101-55312', officerBadge:'DLP-0871', release:'02 Jan 2024',
+    paroleEnd:'02 Jan 2026', phone:'DoT-9812XXXXX',
+    status:'alert', compliance:23,
+    avatar:'https://randomuser.me/api/portraits/men/52.jpg',
+    zones:['Restricted Zone A','Victim workplace (CP)','Lajpat Nagar area'],
+    history:[
+      {year:'2018',title:'Arrest — IPC 392/394',detail:'Armed robbery · Multiple FIRs'},
+      {year:'2020',title:'Conviction — 4 yrs RI',detail:'Sentenced Rohini Court'},
+      {year:'2024',title:'Released · High Risk Flag',detail:'Geo-fence breach recorded 14:32 today'}
+    ]
+  },
+  {
+    id:3, name:'Suresh Kumar', arkId:'ARK-DL-3891',
+    tier:'penguin', tierName:'PENGUIN TIER', tierColor:'#9B59B6',
+    crime:'Organized Fraud & Hawala', crimeType:'Organized Crime',
+    area:'Laxmi Nagar, East Delhi', district:'East Delhi',
+    officer:'SI Priya Singh', officerPhone:'98101-67423', officerBadge:'DLP-1134', release:'20 Jun 2024',
+    paroleEnd:'20 Jun 2026', phone:'DoT-8811XXXXX',
+    status:'compliant', compliance:91,
+    avatar:'https://randomuser.me/api/portraits/men/36.jpg',
+    zones:['Restricted Zone B','Financial district (Nehru Place)'],
+    history:[
+      {year:'2020',title:'Arrest — IPC 420/467',detail:'Fraud & forgery · Enforcement Directorate'},
+      {year:'2022',title:'Conviction — 2 yrs RI',detail:'District & Sessions Court'},
+      {year:'2024',title:'Released on Parole',detail:'Monitoring active · DoT tracking'}
+    ]
+  },
+  {
+    id:4, name:'Pankaj Singh', arkId:'ARK-DL-4521',
+    tier:'scarecrow', tierName:'SCARECROW TIER', tierColor:'#2ECC71',
+    crime:'Narcotics Trafficking', crimeType:'Narcotics',
+    area:'Rohini, North-West Delhi', district:'North-West Delhi',
+    officer:'SI Anand Verma', officerPhone:'98101-78534', officerBadge:'DLP-0965', release:'15 Feb 2024',
+    paroleEnd:'15 Feb 2026', phone:'DoT-9988XXXXX',
+    status:'alert', compliance:41,
+    avatar:'https://randomuser.me/api/portraits/men/61.jpg',
+    zones:['Rohini Sector 7 (drug hotspot)','Azadpur Mandi area'],
+    history:[
+      {year:'2021',title:'Arrest — NDPS Act',detail:'4kg heroin seized · STF operation'},
+      {year:'2022',title:'Conviction — 2 yrs RI',detail:'NDPS Court · Patiala House'},
+      {year:'2024',title:'Released · Missed check-in today',detail:'Signal lost at 13:58 — under review'}
+    ]
+  },
+  {
+    id:5, name:'Amit Verma', arkId:'ARK-DL-2156',
+    tier:'riddler', tierName:'RIDDLER TIER', tierColor:'#4A9EFF',
+    crime:'Cybercrime & Identity Theft', crimeType:'Cyber/Intellectual',
+    area:'Kashmere Gate, North Delhi', district:'North Delhi',
+    officer:'SI Sunita Bhatia', officerPhone:'98101-89645', officerBadge:'DLP-1287', release:'08 Apr 2024',
+    paroleEnd:'08 Apr 2026', phone:'DoT-7761XXXXX',
+    status:'compliant', compliance:78,
+    avatar:'https://randomuser.me/api/portraits/men/29.jpg',
+    zones:['Restricted Zone A','Cyber cell restricted premises'],
+    history:[
+      {year:'2021',title:'Arrest — IT Act 66C/66D',detail:'Rs 2.3 Cr fraud · 200+ victims'},
+      {year:'2022',title:'Conviction — 2 yrs RI',detail:'Delhi High Court · Cyber tribunal'},
+      {year:'2024',title:'Released · Metro tracked',detail:'Kashmere Gate sensor match 13:45'}
+    ]
+  },
+  {
+    id:6, name:'Deepak Yadav', arkId:'ARK-DL-3374',
+    tier:'twoface', tierName:'TWO-FACE TIER', tierColor:'#F0A500',
+    crime:'Repeat Offender — Theft & Burglary', crimeType:'Repeat/Recidivist',
+    area:'Tilak Nagar, West Delhi', district:'West Delhi',
+    officer:'SI Ramesh Gupta', officerPhone:'98101-90756', officerBadge:'DLP-0734', release:'30 Nov 2023',
+    paroleEnd:'30 Nov 2025', phone:'DoT-8899XXXXX',
+    status:'warning', compliance:55,
+    avatar:'https://randomuser.me/api/portraits/men/71.jpg',
+    zones:['Restricted Zone A','Previous victim addresses (3)'],
+    history:[
+      {year:'2017',title:'1st Conviction — IPC 380',detail:'House burglary · 1 yr RI'},
+      {year:'2020',title:'2nd Conviction — IPC 392',detail:'Repeat offence · 3 yrs RI · Tihar'},
+      {year:'2023',title:'Released · Two-Face Flag',detail:'High recidivism risk · Weekly reporting'}
+    ]
+  }
+];
+
+const activities = [
+  {color:'#FF3B3B',text:'<strong>Rajesh Malhotra</strong> entered Restricted Zone A near Connaught Place',time:'14:32 · Today'},
+  {color:'#F0A500',text:'<strong>Pankaj Singh</strong> DoT signal lost — missed 14:00 check-in window',time:'13:58 · Today'},
+  {color:'#4A9EFF',text:'<strong>Amit Verma</strong> detected at Kashmere Gate metro via card swipe',time:'13:45 · Today'},
+  {color:'#FFD166',text:'Smart streetlight Node-4B detected <strong>Vikram Sharma</strong> in Saket',time:'13:30 · Today'},
+  {color:'#2ECC71',text:'<strong>Suresh Kumar</strong> completed weekly thana reporting — Laxmi Nagar',time:'11:00 · Today'},
+  {color:'#9B59B6',text:'<strong>Deepak Yadav</strong> rehabilitation attendance confirmed — Tilak Nagar',time:'10:30 · Today'},
+  {color:'#4A9EFF',text:'ICCC Node synced — 142 CCTV feeds active across Delhi NCR',time:'09:00 · Today'},
+  {color:'#F0A500',text:'Morning compliance check completed — 4/6 offenders confirmed',time:'08:00 · Today'},
+  {color:'#2ECC71',text:'<strong>Vikram Sharma</strong> morning check-in confirmed via DoT mobile ping',time:'07:45 · Today'},
+  {color:'#FF6B35',text:'Geo-fence updated — Rohini Sector 7 added as restricted zone',time:'06:00 · Today'},
+];
+
+// ─── INIT ────────────────────────────────────────────────
+// ─── ALERT POPUP ─────────────────────────────────────────
+function showAlertPopup() {
+  const overlay = document.getElementById('alert-popup-overlay');
+  overlay.style.display = 'flex';
+  const now = new Date();
+  document.getElementById('popup-time').textContent =
+    now.toLocaleTimeString('en-IN', {hour12:false}) + ' IST';
+  let secs = 15;
+  const countdownEl = document.getElementById('countdown-num');
+  const timer = setInterval(() => {
+    secs--;
+    countdownEl.textContent = secs;
+    if (secs <= 0) {
+      clearInterval(timer);
+      overlay.style.display = 'none';
+    }
+  }, 1000);
+}
+
+function launchApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  renderCards(offenders);
+  renderActivity();
+  startClock();
+  // Trigger red alert popup after 3 seconds
+  setTimeout(showAlertPopup, 3000);
+}
+
+function startClock() {
+  setInterval(() => {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toLocaleTimeString('en-IN',{hour12:false}) + ' IST';
+  }, 1000);
+}
+
+function renderCards(list) {
+  const container = document.getElementById('offender-list');
+  container.innerHTML = list.map(o => `
+    <div class="offender-card ${o.status==='alert'?'alert-card':''}"
+         onclick="openProfile(${o.id})"
+         style="border-left:3px solid ${o.tierColor}20">
+      <div class="card-top">
+        <div class="card-avatar" style="border-color:${o.tierColor}60"><img src="${o.avatar}" alt="${o.name}" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"/></div>
+        <div class="card-info">
+          <div class="card-name">${o.name}</div>
+          <div class="card-id">${o.arkId} · ${o.district}</div>
+        </div>
+        <div class="tier-badge ${o.tier}" style="border-color:${o.tierColor};color:${o.tierColor}">${o.tierName.split(' ')[0]}</div>
+      </div>
+      <div class="card-bottom">
+        <div class="card-location">📍 ${o.area.split(',')[0]}</div>
+        <div class="status-pill ${o.status==='compliant'?'status-compliant':o.status==='alert'?'status-alert':'status-warning'}">
+          ${o.status==='compliant'?'✓ Compliant':o.status==='alert'?'⚠ ALERT':'⚡ Warning'}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderActivity() {
+  document.getElementById('highlights-feed').innerHTML = activities.map(a => `
+    <div class="timeline-entry">
+      <div class="timeline-dot" style="background:${a.color}"></div>
+      <div class="timeline-content">
+        <div class="timeline-text">${a.text}</div>
+        <div class="timeline-time">${a.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCards(val) {
+  const filtered = offenders.filter(o =>
+    o.name.toLowerCase().includes(val.toLowerCase()) ||
+    o.arkId.toLowerCase().includes(val.toLowerCase()) ||
+    o.area.toLowerCase().includes(val.toLowerCase())
+  );
+  renderCards(filtered);
+}
+
+function setFilter(type, el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  if (type === 'all') renderCards(offenders);
+  else if (type === 'alert') renderCards(offenders.filter(o => o.status === 'alert'));
+  else if (type === 'extreme') renderCards(offenders.filter(o => o.tier === 'joker'));
+  else if (type === 'high') renderCards(offenders.filter(o => o.tier === 'bane' || o.tier === 'twoface'));
+  else if (type === 'cyber') renderCards(offenders.filter(o => o.tier === 'riddler'));
+  else renderCards(offenders.filter(o => o.tier === type));
+}
+
+function openProfile(id) {
+  const o = offenders.find(x => x.id === id);
+  if (!o) return;
+
+  const complianceBarClass = `${o.tier}-bar`;
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="profile-header">
+      <div class="profile-avatar" style="border-color:${o.tierColor};position:relative">
+          <img src="${o.avatar}" alt="${o.name}" style="width:100%;height:100%;object-fit:cover;object-position:center top;filter:grayscale(10%) contrast(1.1);display:block;" onerror="this.style.display='none'"/>
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);pointer-events:none"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);font-family:'Share Tech Mono',monospace;font-size:0.5rem;letter-spacing:1px;color:rgba(240,165,0,0.8);text-align:center;padding:2px 0">${o.arkId}</div>
+        </div>
+      <div>
+        <div class="profile-name">${o.name}</div>
+        <div class="profile-id">${o.arkId} · SURAKSHA_NET — DELHI POST-RELEASE MONITORING</div>
+        <div class="profile-officer" style="margin-top:0.5rem">Assigned Officer: <span style="color:var(--text)">${o.officer}</span></div>
+        <div class="profile-officer">DoT Tracking: <span style="color:var(--green)">${o.phone}</span></div>
+        <div class="profile-officer" style="margin-top:0.4rem;display:flex;align-items:center;gap:0.8rem">
+          <span>Officer Mobile:</span>
+          <a href="tel:${o.officerPhone.replace('-','')}" style="color:#E53935;text-decoration:none;font-family:var(--mono);font-size:0.65rem;letter-spacing:1px">
+            📞 ${o.officerPhone}
+          </a>
+          <span style="font-family:var(--mono);font-size:0.6rem;color:var(--text-dim)">${o.officerBadge}</span>
+        </div>
+      </div>
+      <div class="profile-tier">
+        <div class="tier-label">Threat Tier</div>
+        <div class="tier-name" style="color:${o.tierColor}">${o.tierName}</div>
+        <div style="margin-top:0.5rem">
+          <div class="status-pill ${o.status==='compliant'?'status-compliant':o.status==='alert'?'status-alert':'status-warning'}" style="display:inline-block">
+            ${o.status==='compliant'?'✓ COMPLIANT':o.status==='alert'?'⚠ ALERT ACTIVE':'⚡ WARNING'}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <div class="info-block">
+        <div class="info-label">Crime / Conviction</div>
+        <div class="info-value">${o.crime}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Crime Type</div>
+        <div class="info-value" style="color:${o.tierColor}">${o.crimeType}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Release Date</div>
+        <div class="info-value">${o.release}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Parole Ends</div>
+        <div class="info-value">${o.paroleEnd}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Current Area</div>
+        <div class="info-value">${o.area}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">District</div>
+        <div class="info-value">${o.district}</div>
+      </div>
+    </div>
+
+    <div class="compliance-section">
+      <div class="section-hdr">Compliance Score</div>
+      <div class="compliance-header">
+        <span>Check-in & Geo-Compliance</span>
+        <span style="color:${o.tierColor}">${o.compliance}%</span>
+      </div>
+      <div class="compliance-bar">
+        <div class="compliance-fill ${complianceBarClass}" style="width:${o.compliance}%"></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text-dim);margin-top:0.4rem">
+        ${o.compliance >= 75 ? '✓ Satisfactory compliance level' : o.compliance >= 50 ? '⚡ Below threshold — increased monitoring' : '⚠ Critical — immediate action required'}
+      </div>
+    </div>
+
+    <div style="margin-bottom:1.5rem">
+      <div class="section-hdr">Restricted Geo-Zones (DoT Enforced)</div>
+      <div class="geo-zones">
+        ${o.zones.map(z => `
+          <div class="geo-zone-item">
+            <span style="color:var(--red);font-size:0.8rem">⊘</span>
+            <span>${z}</span>
+            <span class="geo-zone-status" style="color:var(--red)">RESTRICTED</span>
+          </div>
+        `).join('')}
+        <div class="geo-zone-item">
+          <span style="color:var(--orange);font-size:0.8rem">⊘</span>
+          <span>Delhi NCR boundary — restriction from leaving state</span>
+          <span class="geo-zone-status" style="color:var(--orange)">ENFORCED</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:1.5rem">
+      <div class="section-hdr">Smart City Tracking — Active Sensors</div>
+      <div class="profile-grid" style="gap:0.6rem">
+        <div class="info-block" style="display:flex;align-items:center;gap:0.7rem">
+          <span style="font-size:1.2rem">💡</span>
+          <div><div class="info-label">Streetlight Sensor</div><div class="info-value" style="font-size:0.8rem;color:var(--green)">Active · Node-4B</div></div>
+        </div>
+        <div class="info-block" style="display:flex;align-items:center;gap:0.7rem">
+          <span style="font-size:1.2rem">🚇</span>
+          <div><div class="info-label">Metro Card Tracking</div><div class="info-value" style="font-size:0.8rem;color:var(--green)">Linked · DMRC DB</div></div>
+        </div>
+        <div class="info-block" style="display:flex;align-items:center;gap:0.7rem">
+          <span style="font-size:1.2rem">📱</span>
+          <div><div class="info-label">DoT Mobile Ping</div><div class="info-value" style="font-size:0.8rem;color:var(--green)">Live · 15-min interval</div></div>
+        </div>
+        <div class="info-block" style="display:flex;align-items:center;gap:0.7rem">
+          <span style="font-size:1.2rem">🏙️</span>
+          <div><div class="info-label">ICCC Integration</div><div class="info-value" style="font-size:0.8rem;color:var(--green)">Delhi Smart City Node</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-hdr">Criminal History Timeline</div>
+      <div class="crime-timeline">
+        ${o.history.map(h => `
+          <div class="timeline-modal-entry">
+            <div class="tm-year">${h.year}</div>
+            <div class="tm-dot"></div>
+            <div class="tm-content">
+              <div class="tm-title">${h.title}</div>
+              <div class="tm-detail">${h.detail}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// Map control buttons toggle
+document.querySelectorAll('.map-ctrl-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.map-ctrl-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
